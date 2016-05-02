@@ -191,7 +191,7 @@ class RepoConfigPluginSpec extends Specification {
         gradle.buildListenerBroadcaster.projectsLoaded(gradle)
 
         then:
-        def location = new File(gradle.gradleUserHomeDir, '.intershop').toURI()
+        def location = new File(gradle.gradleUserHomeDir, '.localRepo').toURI()
         project.repositories.ivyLocal.url == location
         project.repositories.mavenLocal.url == location
     }
