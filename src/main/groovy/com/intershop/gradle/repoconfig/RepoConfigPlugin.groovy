@@ -118,7 +118,7 @@ class RepoConfigPlugin implements Plugin<Gradle> {
                     }
                     //adjust versioning for local development
                     project.afterEvaluate {
-                        if (!(project.hasProperty('useSCMVersionConfig') && project.properties.get('useSCMVersionConfig').toString().toLowerCase() == 'true') && !project.version.endsWith('-LOCAL')) {
+                        if (!(project.hasProperty('useSCMVersionConfig') && project.property('useSCMVersionConfig').toString().toLowerCase() == 'true') && !project.version.endsWith('-LOCAL')) {
                             //set project status
                             project.status = 'local'
                             //extend version
@@ -207,7 +207,6 @@ class RepoConfigPlugin implements Plugin<Gradle> {
                 corporateIvyAsArtifactPattern = config.ivyAsAnArtifactPattern
             }
         }
-
     }
 
     /**

@@ -205,16 +205,16 @@ class RepoConfigRegistry {
      * Calculates the setting for special configuration from the system
      * or java environment.
      *
-     * @param envVar        name of environment variable
+     * @param envVar        name of environment variable (-D...)
      * @param systemVar     name of system environemnt variable
      * @param defaultValue  default value
      * @return              the string configuration
      */
-    private static String getConfigurationValue(String systemVar, String envar, String defaultValue) {
-        if(System.properties[systemVar]) {
-            return System.properties[systemVar].toString().trim()
-        } else if(System.getenv(envar)) {
-            return System.getenv(envar).toString().trim()
+    private static String getConfigurationValue(String envVar, String systemVar, String defaultValue) {
+        if(System.properties[envVar]) {
+            return System.properties[envVar].toString().trim()
+        } else if(System.getenv(systemVar)) {
+            return System.getenv(systemVar).toString().trim()
         }
         return defaultValue
     }
