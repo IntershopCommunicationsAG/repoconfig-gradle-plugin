@@ -1,5 +1,5 @@
 = Repository Configuration Init Script Plugin
-:latestRevision: 1.0.0
+:latestRevision: 1.0.1
 :toc:
 
 == Summary
@@ -20,7 +20,7 @@ initscript {
     }
 
     dependencies {
-        classpath 'com.intershop.gradle.repoconfig', name: 'repoconfig-gradle-init-plugin', version: '{latestRevision}'
+        classpath 'com.intershop.gradle.repoconfig:repoconfig-gradle-init-plugin:{latestRevision}'
     }
 }
 
