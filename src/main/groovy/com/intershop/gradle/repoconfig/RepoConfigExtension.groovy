@@ -33,10 +33,21 @@ class RepoConfigExtension {
     /**
      * The list of all allowed repository hosts.
      */
-    String[] repoHostList
+    List<String> repoHostList
 
     /**
      * This is the corporate name for information output.
      */
     String corporateName
+
+    /**
+     * This is a separate public maven repository.
+     * It is used for special use cases.
+     */
+    String pulicMavenRepo
+
+    /**
+     * Add jcenter to the list of repositories
+     */
+    boolean activateJCenter = false
 }

@@ -42,6 +42,8 @@ class RepoConfigPluginIntegSpec extends AbstractIntegrationSpec {
 
             releaseRepo = 'https://test2.corporate.com/repo/content/group/releasesAll'
             snapshotRepo = 'https://test2.corporate.com/repo/content/group/snapshotsAll'
+            pulicMavenRepo = 'https://maven.repo.com/maven'
+            activateJCenter = true
             repoHostList = ['test1.corporate.com', 'test2.corporate.com']
             corporateName = 'test2 corporation'
         }
@@ -53,7 +55,7 @@ class RepoConfigPluginIntegSpec extends AbstractIntegrationSpec {
         apply plugin: 'ivy-publish'
         apply plugin: 'maven-publish'
 
-        assert repositories*.name as Set == ['ivyLocal', 'mavenLocal', 'ivyReleasesAll', 'mavenReleasesAll'] as Set
+        assert repositories*.name as Set == ['ivyLocal', 'mavenLocal', 'ivyReleasesAll', 'mavenReleasesAll', 'mavenMaven', 'BintrayJCenter'] as Set
         assert publishing.repositories*.name as Set == ['ivyLocal', 'mavenLocal'] as Set
         """.stripIndent()
         
@@ -64,6 +66,57 @@ class RepoConfigPluginIntegSpec extends AbstractIntegrationSpec {
                     .withGradleVersion(gradleVersion)
                     .build()
         
+        then:
+        noExceptionThrown()
+
+        where:
+        gradleVersion << supportedGradleVersions
+    }
+
+    def 'CorporatePlugin is compatible with Gradle and without JCenter #gradleVersion'(gradleVersion) {
+
+        given:
+
+        String libs = ''
+        pluginClasspath.each {
+            libs += "classpath files { new File('${it.absolutePath.replace('\\', '/')}') }\n"
+        }
+
+        new File(testProjectDir, 'init.gradle') << """\
+        initscript {
+            dependencies {
+                ${libs}
+            }
+        }
+        apply plugin: com.intershop.gradle.repoconfig.RepoConfigPlugin
+
+        repositoryConfiguration {
+
+            releaseRepo = 'https://test2.corporate.com/repo/content/group/releasesAll'
+            snapshotRepo = 'https://test2.corporate.com/repo/content/group/snapshotsAll'
+            pulicMavenRepo = 'https://maven.repo.com/maven'
+            repoHostList = ['test1.corporate.com', 'test2.corporate.com']
+            corporateName = 'test2 corporation'
+        }
+        """.stripIndent()
+
+        buildFile << """
+        // provide some configurations etc.
+        apply plugin: 'java'
+        apply plugin: 'ivy-publish'
+        apply plugin: 'maven-publish'
+
+        assert repositories*.name as Set == ['ivyLocal', 'mavenLocal', 'ivyReleasesAll', 'mavenReleasesAll', 'mavenMaven'] as Set
+        assert publishing.repositories*.name as Set == ['ivyLocal', 'mavenLocal'] as Set
+        """.stripIndent()
+
+        when:
+        def result = preparedGradleRunner
+                .withTestKitDir(new File(testProjectDir, 'testkit-tmp'))
+                .withArguments('-I', 'init.gradle', '-s')
+                .withGradleVersion(gradleVersion)
+                .build()
+
         then:
         noExceptionThrown()
 

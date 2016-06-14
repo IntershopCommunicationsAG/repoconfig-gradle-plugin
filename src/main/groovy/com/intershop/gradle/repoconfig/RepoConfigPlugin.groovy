@@ -67,6 +67,10 @@ class RepoConfigPlugin implements Plugin<Gradle> {
                 if (config.enableSnapshots) {
                     addSnapshotsRepositories(repositories, configurations)
                 }
+
+                addPulicMavenRepository(repositories)
+                addJCenter(repositories)
+
                 // add pattern
                 if(! config.disableIvyPattern) {
                     repositories.withType(IvyArtifactRepository) { IvyArtifactRepository repo ->
@@ -89,19 +93,6 @@ class RepoConfigPlugin implements Plugin<Gradle> {
 
         gradle.allprojects { Project project ->
             SingleMessageLogger.nagUserWith("Defaults for '${extension.getCorporateName() ?: 'project'}' are used!")
-
-            // Remove repositories that are non-local and pointing to our repository server or not maven or ivy repositories
-            project.repositories.all { ArtifactRepository repo ->
-                if (!(repo instanceof MavenArtifactRepository) && !(repo instanceof IvyArtifactRepository)) {
-                    project.repositories.remove repo
-                    project.logger.warn("Repository '{}' of type '{}' on project '{}' removed. Only Maven und Ivy repositories are allowed.",
-                            repo.name, repo.getClass().name, project.path)
-                } else if (repo.url && !(repo.url.host.toString() in extension.getRepoHostList()) && !(repo.url.scheme == 'file')) {
-                    project.repositories.remove repo
-                    project.logger.warn("Repository '{}' with url '{}' removed from project '{}'. Only repositories on '{}' are allowed.",
-                            repo.name, repo.url, project.path, extension.getRepoHostList().join(','))
-                }
-            }
 
             if(!config.disableInitDefaults) {
                 if (!config.disableLocalRepository) {
@@ -146,7 +137,7 @@ class RepoConfigPlugin implements Plugin<Gradle> {
 
                 //add repositories
                 if (!config.disableRepos) {
-                    log.debug('Add repositories for project for project {}', project.path)
+                    log.debug('Add repositories for project build {}', project.path)
                     addRepositories(project.repositories, project.configurations)
                 }
                 //add build script repositories
@@ -164,6 +155,12 @@ class RepoConfigPlugin implements Plugin<Gradle> {
                     log.debug('Add snapshot repositories for build script for project {}', project.path)
                     addSnapshotsRepositories(project.buildscript.repositories, project.buildscript.configurations)
                 }
+
+                addPulicMavenRepository(project.repositories)
+                addPulicMavenRepository(project.buildscript.repositories)
+
+                addJCenter(project.repositories)
+                addJCenter(project.buildscript.repositories)
             }
             // set pattern for publishing
             if (!config.disableIvyPatternPublish) {
@@ -200,12 +197,60 @@ class RepoConfigPlugin implements Plugin<Gradle> {
                 }
             }
 
+            // Remove repositories that are non-local and pointing to our repository server or not maven or ivy repositories
+            project.repositories.all { ArtifactRepository repo ->
+                if (!(repo instanceof MavenArtifactRepository) && !(repo instanceof IvyArtifactRepository)) {
+                    project.repositories.remove repo
+                    project.logger.warn("Repository '{}' of type '{}' on project '{}' removed. Only Maven und Ivy repositories are allowed.",
+                            repo.name, repo.getClass().name, project.path)
+                } else if (repo.url && !(repo.url.host.toString() in extension.getRepoHostList()) && !(repo.url.scheme == 'file')) {
+                    project.repositories.remove repo
+                    project.logger.warn("Repository '{}' with url '{}' removed from project '{}'. Only repositories on '{}' are allowed.",
+                            repo.name, repo.url, project.path, extension.getRepoHostList().join(','))
+                }
+            }
+
             //add project properties
             project.ext {
                 corporateIvyPattern = config.ivyPattern
                 corporateArtifactPattern = config.artifactPattern
                 corporateIvyAsArtifactPattern = config.ivyAsAnArtifactPattern
             }
+        }
+    }
+
+    /**
+     * Add an additional Maven repository configurations
+     * @param repositories
+     * @param configurations
+     */
+    @TypeChecked
+    private void addJCenter(RepositoryHandler repositories) {
+        if(extension.activateJCenter) {
+            log.debug('Add JCenter repository if activateJCenter is true')
+            MavenArtifactRepository repo = repositories.jcenter()
+            try {
+                extension.getRepoHostList().add(repo.url.getHost().toString())
+            } catch (Exception ex) {
+                log.info("This is not a URL or there is no host in jcenter configuration.", extension.getPulicMavenRepo())
+            }
+        }
+    }
+
+    /**
+     * Add an additional Maven repository configurations
+     * @param repositories
+     * @param configurations
+     */
+    @TypeChecked
+    private void addPulicMavenRepository(RepositoryHandler repositories) {
+        log.debug('Add maven repository {}', extension.getPulicMavenRepo())
+        config.addMavenRepo(repositories, extension.getPulicMavenRepo(), '', '')
+
+        try {
+            extension.getRepoHostList().add((new URL(extension.getPulicMavenRepo())).getHost().toString())
+        }catch (Exception ex) {
+            log.info("This is not a URL or there is no host in {}", extension.getPulicMavenRepo())
         }
     }
 
@@ -220,7 +265,7 @@ class RepoConfigPlugin implements Plugin<Gradle> {
         log.debug('Add snapshot ivy repository {}', extension.getSnapshotRepo())
         config.addIvyRepoConfig(repositories, extension.getSnapshotRepo())
 
-        log.debug('Add maven ivy repository {}', extension.getSnapshotRepo())
+        log.debug('Add maven repository {}', extension.getSnapshotRepo())
         config.addMavenRepo(repositories, extension.getSnapshotRepo())
 
         // check always for new version
