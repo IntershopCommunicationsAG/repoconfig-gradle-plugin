@@ -1,5 +1,5 @@
 = Repository Configuration Init Script Plugin
-:latestRevision: 1.0.0
+:latestRevision: 1.1.0
 :toc:
 
 == Summary
@@ -88,6 +88,8 @@ deploymentBootstrap {
 |*`snapshotRepo`*  |`String`  | `null` |  | repository URL of a repository group with snapshots for read access
 |*`repoHostList`*  |`[String]`| `null` |  | list of allowed repository hosts. Repositories with other host names in build scripts will be dropped
 |*`corporateName`* |`String`  | `null` |  | this property is used in information output
+|*`pulicMavenRepo`* |`String`  | `null` |  | repository URL of a repository or repository group with Maven artifacts. This can be used for a public Maven repository. The host of this repository is added to the list of allowed hosts automatically.
+|*`activateJCenter`* |`boolean`  | `false` |  | If this value is true, JCenter will be added to the list of repsoitories. The host of this repository is added to the list of allowed hosts automatically.
 
 |===
 
