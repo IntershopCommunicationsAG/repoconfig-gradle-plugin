@@ -203,7 +203,7 @@ class RepoConfigPlugin implements Plugin<Gradle> {
                     project.repositories.remove repo
                     project.logger.warn("Repository '{}' of type '{}' on project '{}' removed. Only Maven und Ivy repositories are allowed.",
                             repo.name, repo.getClass().name, project.path)
-                } else if (repo.url && !(repo.url.host.toString() in extension.getRepoHostList()) && !(repo.url.scheme == 'file')) {
+                } else if (extension.getRepoHostList() && ! extension.getRepoHostList().isEmpty() && repo.url && !(repo.url.host.toString() in extension.getRepoHostList()) && !(repo.url.scheme == 'file')) {
                     project.repositories.remove repo
                     project.logger.warn("Repository '{}' with url '{}' removed from project '{}'. Only repositories on '{}' are allowed.",
                             repo.name, repo.url, project.path, extension.getRepoHostList().join(','))
@@ -230,7 +230,9 @@ class RepoConfigPlugin implements Plugin<Gradle> {
             log.debug('Add JCenter repository if activateJCenter is true')
             MavenArtifactRepository repo = repositories.jcenter()
             try {
-                extension.getRepoHostList().add(repo.url.getHost().toString())
+                if( extension.getRepoHostList() && ! extension.getRepoHostList().isEmpty() ) {
+                    extension.getRepoHostList().add(repo.url.getHost().toString())
+                }
             } catch (Exception ex) {
                 log.info("This is not a URL or there is no host in jcenter configuration.", extension.getPulicMavenRepo())
             }
@@ -248,7 +250,9 @@ class RepoConfigPlugin implements Plugin<Gradle> {
         config.addMavenRepo(repositories, extension.getPulicMavenRepo(), '', '')
 
         try {
-            extension.getRepoHostList().add((new URL(extension.getPulicMavenRepo())).getHost().toString())
+            if( extension.getRepoHostList() && ! extension.getRepoHostList().isEmpty() ) {
+                extension.getRepoHostList().add((new URL(extension.getPulicMavenRepo())).getHost().toString())
+            }
         }catch (Exception ex) {
             log.info("This is not a URL or there is no host in {}", extension.getPulicMavenRepo())
         }
