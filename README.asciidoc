@@ -20,7 +20,7 @@ initscript {
     }
 
     dependencies {
-        classpath 'com.intershop.gradle.repoconfig:repoconfig-gradle-init-plugin:{latestRevision}'
+        classpath 'com.intershop.gradle.repoconfig:repoconfig-gradle-plugin:{latestRevision}'
     }
 }
 
