@@ -31,6 +31,34 @@ class RepoConfigExtension {
     String snapshotRepo
 
     /**
+     * This is the url of an IVY release repository group.
+     * If this repo is specified, the configuration for releaseRepo is not used.
+     * It is used only for actions with read access.
+     **/
+    String ivyReleaseRepo
+
+    /**
+     * This is the url of an IVY release repository group.
+     * If this repo is specified, the configuration for snapshotRepo is not used.
+     * It is used only for actions with read access.
+     **/
+    String ivySnapshotRepo
+
+    /**
+     * This is the url of an MAVEN release repository group.
+     * If this repo is specified, the configuration for releaseRepo is not used.
+     * It is used only for actions with read access.
+     **/
+    String mvnReleaseRepo
+
+    /**
+     * This is the url of an MAVEN release repository group.
+     * If this repo is specified, the configuration for snapshotRepo is not used.
+     * It is used only for actions with read access.
+     **/
+    String mvnSnapshotRepo
+
+    /**
      * The list of all allowed repository hosts.
      */
     List<String> repoHostList

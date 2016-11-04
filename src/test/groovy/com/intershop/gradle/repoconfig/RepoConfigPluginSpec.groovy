@@ -88,6 +88,32 @@ class RepoConfigPluginSpec extends Specification {
         object << ['project', 'gradle']
     }
 
+    def 'repository URLs are configured correctly (ivy/mvn)'() {
+        given:
+        System.properties['enableSnapshots'] = 'true'
+
+        when:
+        gradle.apply plugin: RepoConfigPlugin
+        gradle.repositoryConfiguration.ivyReleaseRepo = 'https://test2.corporate.com/repo/content/group/releasesIVY'
+        gradle.repositoryConfiguration.ivySnapshotRepo = 'https://test2.corporate.com/repo/content/group/snapshotsIVY'
+        gradle.repositoryConfiguration.mvnReleaseRepo = 'https://test2.corporate.com/repo/content/group/releasesMVN'
+        gradle.repositoryConfiguration.mvnSnapshotRepo = 'https://test2.corporate.com/repo/content/group/snapshotsMVN'
+
+        gradle.repositoryConfiguration.repoHostList = ['test1.corporate.com', 'test2.corporate.com']
+        gradle.repositoryConfiguration.corporateName = 'test2 corporation'
+        // explicitly trigger event, required for gradle.allprojects { }
+        gradle.buildListenerBroadcaster.projectsLoaded(gradle)
+
+        then:
+        project.repositories.each {
+            println it.name
+        }
+        project.repositories.'ivyReleasesIVY'.url       == URI.create('https://test2.corporate.com/repo/content/group/releasesIVY')
+        project.repositories.'mavenReleasesMVN'.url     == URI.create('https://test2.corporate.com/repo/content/group/releasesMVN')
+        project.repositories.'ivySnapshotsIVY'.url      == URI.create('https://test2.corporate.com/repo/content/group/snapshotsIVY')
+        project.repositories.'mavenSnapshotsMVN'.url    == URI.create('https://test2.corporate.com/repo/content/group/snapshotsMVN')
+    }
+
     def 'repository URLs are configured correctly'() {
         given:
         System.properties['enableSnapshots'] = 'true'
