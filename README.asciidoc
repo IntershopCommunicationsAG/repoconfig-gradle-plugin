@@ -28,11 +28,19 @@ apply plugin: com.intershop.gradle.repoconfig.RepoConfigPlugin
 
 repositoryConfiguration {
 
+    // all repos in one
     releaseRepo = 'https://repository.host.com/repo/content/group/releasesAll'
     snapshotRepo = 'https://repository.host.com/repo/content/group/snapshotsAll'
+
+    // or ivy and mvn splitted
+    ivyReleaseRepo = 'https://repository.host.com/repo/content/group/releasesIVY'
+    mvnReleaseRepo = 'https://repository.host.com/repo/content/group/releasesMVN'
+    ivySnapshotRepo = 'https://repository.host.com/repo/content/group/snapshotsIVY'
+    mvnSnapshotRepo = 'https://repository.host.com/repo/content/group/snapshotsMVN'
+
+    // company settings
     repoHostList = ['repository.host.com', 'repository.host.de']
     corporateName = 'project or company name'
-
 }
 
 ----
@@ -86,6 +94,12 @@ deploymentBootstrap {
 
 |*`releaseRepo`*   |`String`  | `null` |  | repository URL of a repository group with releases for read access
 |*`snapshotRepo`*  |`String`  | `null` |  | repository URL of a repository group with snapshots for read access
+
+|*`ivyReleaseRepo`*   |`String`  | `null` |  | repository URL of a repository group with IVY releases for read access
+|*`mvnReleaseRepo`*   |`String`  | `null` |  | repository URL of a repository group with MAVEN releases for read access
+|*`ivySnapshotRepo`*  |`String`  | `null` |  | repository URL of a repository group with IVY snapshots for read access
+|*`mvnSnapshotRepo`*  |`String`  | `null` |  | repository URL of a repository group with MAVEN snapshots for read access
+
 |*`repoHostList`*  |`[String]`| `null` |  | list of allowed repository hosts. Repositories with other host names in build scripts will be dropped
 |*`corporateName`* |`String`  | `null` |  | this property is used in information output
 |*`pulicMavenRepo`* |`String`  | `null` |  | repository URL of a repository or repository group with Maven artifacts. This can be used for a public Maven repository. The host of this repository is added to the list of allowed hosts automatically.

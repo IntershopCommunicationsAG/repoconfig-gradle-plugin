@@ -265,13 +265,26 @@ class RepoConfigPlugin implements Plugin<Gradle> {
      */
     @TypeChecked
     private void addSnapshotsRepositories(RepositoryHandler repositories, ConfigurationContainer configurations) {
-        // add default repositories
-        log.debug('Add snapshot ivy repository {}', extension.getSnapshotRepo())
-        config.addIvyRepoConfig(repositories, extension.getSnapshotRepo())
+        if(extension.getIvySnapshotRepo()) {
+            // add default repositories
+            log.debug('Add snapshot ivy repository {}', extension.getIvySnapshotRepo())
+            config.addIvyRepoConfig(repositories, extension.getIvySnapshotRepo())
+        }
 
-        log.debug('Add maven repository {}', extension.getSnapshotRepo())
-        config.addMavenRepo(repositories, extension.getSnapshotRepo())
+        if(extension.getMvnSnapshotRepo()) {
+            // add default repositories
+            log.debug('Add maven repository {}', extension.getMvnSnapshotRepo())
+            config.addMavenRepo(repositories, extension.getMvnSnapshotRepo())
+        }
 
+        if(extension.getSnapshotRepo()) {
+            // add default repositories
+            log.debug('Add snapshot ivy repository {}', extension.getSnapshotRepo())
+            config.addIvyRepoConfig(repositories, extension.getSnapshotRepo())
+
+            log.debug('Add maven repository {}', extension.getSnapshotRepo())
+            config.addMavenRepo(repositories, extension.getSnapshotRepo())
+        }
         // check always for new version
         config.setChangingModules(configurations)
     }
@@ -283,12 +296,26 @@ class RepoConfigPlugin implements Plugin<Gradle> {
      */
     @TypeChecked
     private void addRepositories(RepositoryHandler repositories, ConfigurationContainer configurations) {
-        // add default repositories
-        log.debug('Add ivy repository {}', extension.getReleaseRepo())
-        config.addIvyRepoConfig(repositories, extension.getReleaseRepo())
+        if(extension.getIvyReleaseRepo()) {
+            // add default repositories
+            log.debug('Add ivy repository {}', extension.getIvyReleaseRepo())
+            config.addIvyRepoConfig(repositories, extension.getIvyReleaseRepo())
+        }
 
-        log.debug('Add maven repository {}', extension.getReleaseRepo())
-        config.addMavenRepo(repositories, extension.getReleaseRepo())
+        if(extension.getMvnReleaseRepo()) {
+            // add default repositories
+            log.debug('Add maven repository {}', extension.getMvnReleaseRepo())
+            config.addMavenRepo(repositories, extension.getMvnReleaseRepo())
+        }
+
+        if(extension.getReleaseRepo()) {
+            // add default repositories
+            log.debug('Add ivy repository {}', extension.getReleaseRepo())
+            config.addIvyRepoConfig(repositories, extension.getReleaseRepo())
+
+            log.debug('Add maven repository {}', extension.getReleaseRepo())
+            config.addMavenRepo(repositories, extension.getReleaseRepo())
+        }
 
         // check always for new version
         config.setChangingModules(configurations)
