@@ -72,7 +72,7 @@ class RepoConfigExtension {
      * This is a separate public maven repository.
      * It is used for special use cases.
      */
-    String pulicMavenRepo
+    String publicMavenRepo
 
     /**
      * Add jcenter to the list of repositories
