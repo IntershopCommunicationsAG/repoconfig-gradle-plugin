@@ -42,7 +42,7 @@ class RepoConfigPluginIntegSpec extends AbstractIntegrationSpec {
 
             releaseRepo = 'https://test2.corporate.com/repo/content/group/releasesAll'
             snapshotRepo = 'https://test2.corporate.com/repo/content/group/snapshotsAll'
-            pulicMavenRepo = 'https://maven.repo.com/maven'
+            publicMavenRepo = 'https://maven.repo.com/maven'
             activateJCenter = true
             repoHostList = ['test1.corporate.com', 'test2.corporate.com']
             corporateName = 'test2 corporation'
@@ -94,7 +94,7 @@ class RepoConfigPluginIntegSpec extends AbstractIntegrationSpec {
 
             releaseRepo = 'https://test2.corporate.com/repo/content/group/releasesAll'
             snapshotRepo = 'https://test2.corporate.com/repo/content/group/snapshotsAll'
-            pulicMavenRepo = 'https://maven.repo.com/maven'
+            publicMavenRepo = 'https://maven.repo.com/maven'
             repoHostList = ['test1.corporate.com', 'test2.corporate.com']
             corporateName = 'test2 corporation'
         }
