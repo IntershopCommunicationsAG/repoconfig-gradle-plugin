@@ -234,7 +234,7 @@ class RepoConfigPlugin implements Plugin<Gradle> {
                     extension.getRepoHostList().add(repo.url.getHost().toString())
                 }
             } catch (Exception ex) {
-                log.info("This is not a URL or there is no host in jcenter configuration.", extension.getPulicMavenRepo())
+                log.info("This is not a URL or there is no host in jcenter configuration.", extension.getPublicMavenRepo())
             }
         }
     }
@@ -246,15 +246,15 @@ class RepoConfigPlugin implements Plugin<Gradle> {
      */
     @TypeChecked
     private void addPulicMavenRepository(RepositoryHandler repositories) {
-        log.debug('Add maven repository {}', extension.getPulicMavenRepo())
-        config.addMavenRepo(repositories, extension.getPulicMavenRepo(), '', '')
+        log.debug('Add maven repository {}', extension.getPublicMavenRepo())
+        config.addMavenRepo(repositories, extension.getPublicMavenRepo(), '', '')
 
         try {
             if( extension.getRepoHostList() && ! extension.getRepoHostList().isEmpty() ) {
-                extension.getRepoHostList().add((new URL(extension.getPulicMavenRepo())).getHost().toString())
+                extension.getRepoHostList().add((new URL(extension.getPublicMavenRepo())).getHost().toString())
             }
         }catch (Exception ex) {
-            log.info("This is not a URL or there is no host in {}", extension.getPulicMavenRepo())
+            log.info("This is not a URL or there is no host in {}", extension.getPublicMavenRepo())
         }
     }
 
