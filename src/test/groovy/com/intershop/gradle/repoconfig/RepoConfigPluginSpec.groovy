@@ -237,29 +237,6 @@ class RepoConfigPluginSpec extends Specification {
         project.repositories.mavenLocal.url == location
     }
     
-    def 'project version #desc'(desc, version, disableLocalRepo, useSCMVersionConfig, expected) {
-        given:
-        System.properties['disableLocalRepo'] = disableLocalRepo
-        project.ext.useSCMVersionConfig = useSCMVersionConfig
-        project.version = version
-        
-        when:
-        gradle.apply plugin: RepoConfigPlugin
-        // explicitly trigger event, required for gradle.allprojects { }
-        gradle.buildListenerBroadcaster.projectsLoaded(gradle)
-        project.evaluate()
-        
-        then:
-        project.version == expected
-        
-        where:
-        desc                          | version     | disableLocalRepo | useSCMVersionConfig | expected
-        'is appended by -LOCAL'       | '1.0'       | false            | null                | '1.0-LOCAL'
-        'gets -LOCAL just once'       | '1.0-LOCAL' | false            | null                | '1.0-LOCAL'
-        'is kept without local'       | '1.0'       | true             | null                | '1.0'
-        'is kept with scm versioning' | '1.0'       | false            | true                | '1.0'
-    }
-    
     def 'local publishing is configured for #plugin'(plugin, repo) {
         when:
         gradle.apply plugin: RepoConfigPlugin

@@ -152,16 +152,6 @@ For special use cases it is necessary to enable or disable special sets of repos
 |`DISABLE_IVYPATTERN`  |`disableIvyPattern`  |`false`|If true, the default ivy pattern will be disabled for all build configurations.
 |===
 
-=== Additional Project Properties
-For special use cases it is necessary to enable or disable special configurations.
-
-[cols="15%,85%", width="90%", options="header"]
-|===
-| Project property | Description
-
-|`useSCMVersionConfig` | If this property exists and the value of this is true, the corporate plugin does not add 'LOCAL' to the version of a local publishing.
-|===
-
 == License
 
 Copyright 2014-2016 Intershop Communications.

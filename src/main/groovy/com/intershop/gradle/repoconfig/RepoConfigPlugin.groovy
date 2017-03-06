@@ -26,7 +26,6 @@ import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.invocation.Gradle
 import org.gradle.api.publish.ivy.plugins.IvyPublishPlugin
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin
-import org.gradle.util.SingleMessageLogger
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -51,10 +50,12 @@ class RepoConfigPlugin implements Plugin<Gradle> {
 
         if (!config.disableInitDefaults) {
             // add repositories to settings gradle repositories configuration
+            int outputGradleCount = 0
             gradle.ext.injectRepositories = { RepositoryHandler repositories, ConfigurationContainer configurations ->
-
-                SingleMessageLogger.nagUserWith("Defaults for ${extension.getCorporateName() ?: 'project'} are used for inject repositories!")
-
+                if(outputGradleCount == 0) {
+                    println "Defaults for ${extension.getCorporateName() ?: 'project'} are used for inject repositories!"
+                    outputGradleCount = 1
+                }
                 // local repository
                 if(! config.disableLocalRepository) {
                     addLocalRepository(repositories, repoPath)
@@ -91,9 +92,13 @@ class RepoConfigPlugin implements Plugin<Gradle> {
             corporateIvyAsArtifactPattern = config.ivyAsAnArtifactPattern
         }
 
-        gradle.allprojects { Project project ->
-            SingleMessageLogger.nagUserWith("Defaults for '${extension.getCorporateName() ?: 'project'}' are used!")
 
+        int outputProjectCount = 0
+        gradle.allprojects { Project project ->
+            if(outputProjectCount == 0) {
+                println "Defaults for ${extension.getCorporateName() ?: 'project'} are used for inject repositories!"
+                outputProjectCount = 1
+            }
             if(!config.disableInitDefaults) {
                 if (!config.disableLocalRepository) {
                     log.debug('Add local repositories for project, build script and publishing for project {}', project.path)
@@ -105,15 +110,6 @@ class RepoConfigPlugin implements Plugin<Gradle> {
                     project.plugins.withType(IvyPublishPlugin) {
                         project.publishing {
                             config.addLocalIvyRepo(repositories, repoPath)
-                        }
-                    }
-                    //adjust versioning for local development
-                    project.afterEvaluate {
-                        if (!(project.hasProperty('useSCMVersionConfig') && project.property('useSCMVersionConfig').toString().toLowerCase() == 'true') && !project.version.endsWith('-LOCAL')) {
-                            //set project status
-                            project.status = 'local'
-                            //extend version
-                            project.version = "$project.version-LOCAL"
                         }
                     }
 
