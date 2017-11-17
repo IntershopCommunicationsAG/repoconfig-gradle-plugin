@@ -35,10 +35,8 @@ group 'com.intershop.gradle.repoconfig'
 description 'Repository Configuration Init Script Plugin for project teams or companies'
 version = scm.version.version
 
-// plugins should work with JDK 1.7 aslong
-// older INTERSHOP version use this version of JDK
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 // set correct project status
 if (project.version.endsWith('-SNAPSHOT')) {
