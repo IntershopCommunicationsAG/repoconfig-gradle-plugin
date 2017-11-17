@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Intershop Communications AG.
+ * Copyright 2017 Intershop Communications AG.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.intershop.gradle.repoconfig
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 class RepoConfigExtension {
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Intershop Communications AG.
+ * Copyright 2017 Intershop Communications AG.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,9 @@ class RepoConfigPluginIntegSpec extends AbstractIntegrationSpec {
     def 'CorporatePlugin is compatible with Gradle #gradleVersion'(gradleVersion) {
 
         given:
-
         String libs = ''
-        pluginClasspath.each {
-            libs += "classpath files { new File('${it.absolutePath.replace('\\', '/')}') }\n"
+        System.getProperty('intershop.classpath').split(':').each {
+            libs += "classpath files { new File('${it.replace('\\', '/')}') }\n"
         }
 
         new File(testProjectDir, 'init.gradle') << """\
@@ -55,12 +54,12 @@ class RepoConfigPluginIntegSpec extends AbstractIntegrationSpec {
         apply plugin: 'ivy-publish'
         apply plugin: 'maven-publish'
 
-        assert repositories*.name as Set == ['ivyLocal', 'mavenLocal', 'ivyReleasesAll', 'mavenReleasesAll', 'mavenMaven', 'BintrayJCenter'] as Set
-        assert publishing.repositories*.name as Set == ['ivyLocal', 'mavenLocal'] as Set
+        assert repositories*.name as Set == ['intershopIvyLocal', 'intershopMavenLocal', 'intershopIvyReleasesAll', 'intershopMavenReleasesAll', 'intershopMavenMaven', 'BintrayJCenter'] as Set
+        assert publishing.repositories*.name as Set == ['intershopIvyLocal', 'intershopMavenLocal'] as Set
         """.stripIndent()
         
         when:
-        def result = preparedGradleRunner
+        preparedGradleRunner
                     .withTestKitDir(new File(testProjectDir, 'testkit-tmp'))
                     .withArguments('-I', 'init.gradle', '-s')
                     .withGradleVersion(gradleVersion)
@@ -76,10 +75,9 @@ class RepoConfigPluginIntegSpec extends AbstractIntegrationSpec {
     def 'CorporatePlugin is compatible with Gradle and without JCenter #gradleVersion'(gradleVersion) {
 
         given:
-
         String libs = ''
-        pluginClasspath.each {
-            libs += "classpath files { new File('${it.absolutePath.replace('\\', '/')}') }\n"
+        System.getProperty('intershop.classpath').split(':').each {
+            libs += "classpath files { new File('${it.replace('\\', '/')}') }\n"
         }
 
         new File(testProjectDir, 'init.gradle') << """\
@@ -106,12 +104,12 @@ class RepoConfigPluginIntegSpec extends AbstractIntegrationSpec {
         apply plugin: 'ivy-publish'
         apply plugin: 'maven-publish'
 
-        assert repositories*.name as Set == ['ivyLocal', 'mavenLocal', 'ivyReleasesAll', 'mavenReleasesAll', 'mavenMaven'] as Set
-        assert publishing.repositories*.name as Set == ['ivyLocal', 'mavenLocal'] as Set
+        assert repositories*.name as Set == ['intershopIvyLocal', 'intershopMavenLocal', 'intershopIvyReleasesAll', 'intershopMavenReleasesAll', 'intershopMavenMaven'] as Set
+        assert publishing.repositories*.name as Set == ['intershopIvyLocal', 'intershopMavenLocal'] as Set
         """.stripIndent()
 
         when:
-        def result = preparedGradleRunner
+        preparedGradleRunner
                 .withTestKitDir(new File(testProjectDir, 'testkit-tmp'))
                 .withArguments('-I', 'init.gradle', '-s')
                 .withGradleVersion(gradleVersion)

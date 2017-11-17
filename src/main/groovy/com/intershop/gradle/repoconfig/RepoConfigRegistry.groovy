@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Intershop Communications AG.
+ * Copyright 2017 Intershop Communications AG.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package com.intershop.gradle.repoconfig
 
+import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
 import groovy.transform.TypeCheckingMode
-
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.artifacts.ExternalModuleDependency
@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory
 /**
  * This is the registry for all configurations. It is used by the RepoConfigPlugin.
  */
-@TypeChecked
+@CompileStatic
 class RepoConfigRegistry {
 
     final static Logger log = LoggerFactory.getLogger(RepoConfigRegistry)
@@ -117,13 +117,13 @@ class RepoConfigRegistry {
      * For secured repository access it is necessary to specify user credentials
      * This is the user name
      */
-    final String repoUserName = ''
+    final String repoUserName
 
     /**
      * For secured repository access it is necessary to specify user credentials
      * This is the user password
      */
-    final String repoUserPasswd = ''
+    final String repoUserPasswd
 
     /**
      * Disable default settings
@@ -250,7 +250,7 @@ class RepoConfigRegistry {
             def id = path.contains('/') ? path.substring(path.lastIndexOf('/') + 1) : path
 
             repohandler.ivy {
-                name "ivy${id.capitalize()}"
+                name "intershopIvy${id.capitalize()}"
                 url "${path}"
                 if (user && passwd) {
                     credentials {
@@ -276,7 +276,7 @@ class RepoConfigRegistry {
             def id = path.contains('/') ? path.substring(path.lastIndexOf('/') + 1) : path
 
             repohandler.maven {
-                name = "maven${id.capitalize()}"
+                name = "intershopMaven${id.capitalize()}"
                 url "${path}"
                 if (user && passwd) {
                     credentials {
@@ -296,7 +296,7 @@ class RepoConfigRegistry {
     @TypeChecked(TypeCheckingMode.SKIP)
     void addLocalIvyRepo(RepositoryHandler repohandler, String path) {
         repohandler.ivy {
-            name 'ivyLocal'
+            name 'intershopIvyLocal'
             url "file://${path}"
         }
     }
@@ -309,7 +309,7 @@ class RepoConfigRegistry {
     @TypeChecked(TypeCheckingMode.SKIP)
     void addLocalMavenRepo(RepositoryHandler repohandler, String path) {
         repohandler.maven {
-            name = 'mavenLocal'
+            name = 'intershopMavenLocal'
             url "file://${path}"
         }
     }
@@ -319,7 +319,7 @@ class RepoConfigRegistry {
      * @param configurations
      * @param suffix
      */
-    void setChangingModules(ConfigurationContainer configurations, String suffix = '-SNAPSHOT') {
+    static void setChangingModules(ConfigurationContainer configurations, String suffix = '-SNAPSHOT') {
         configurations.all { Configuration config ->
             config.dependencies.withType(ExternalModuleDependency) { ExternalModuleDependency dependency ->
                 if (dependency.version) {

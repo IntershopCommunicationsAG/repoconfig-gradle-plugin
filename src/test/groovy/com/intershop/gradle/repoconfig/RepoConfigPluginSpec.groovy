@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Intershop Communications AG.
+ * Copyright 2017 Intershop Communications AG.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,12 +33,12 @@ class RepoConfigPluginSpec extends Specification {
 
     private Set oldSystemProps
 
-    static final IVY = ['ivyReleasesAll']
-    static final IVY_SNAPSHOT = ['ivySnapshotsAll']
-    static final IVY_LOCAL = ['ivyLocal']
-    static final MAVEN = ['mavenReleasesAll']
-    static final MAVEN_SNAPSHOT = ['mavenSnapshotsAll']
-    static final MAVEN_LOCAL = ['mavenLocal']
+    static final IVY = ['intershopIvyReleasesAll']
+    static final IVY_SNAPSHOT = ['intershopIvySnapshotsAll']
+    static final IVY_LOCAL = ['intershopIvyLocal']
+    static final MAVEN = ['intershopMavenReleasesAll']
+    static final MAVEN_SNAPSHOT = ['intershopMavenSnapshotsAll']
+    static final MAVEN_LOCAL = ['intershopMavenLocal']
     
     def setup() {
         System.setProperty('GRADLE_USER_HOME', new File(testDir, 'gradleHome').absolutePath)
@@ -108,10 +108,10 @@ class RepoConfigPluginSpec extends Specification {
         project.repositories.each {
             println it.name
         }
-        project.repositories.'ivyReleasesIVY'.url       == URI.create('https://test2.corporate.com/repo/content/group/releasesIVY')
-        project.repositories.'mavenReleasesMVN'.url     == URI.create('https://test2.corporate.com/repo/content/group/releasesMVN')
-        project.repositories.'ivySnapshotsIVY'.url      == URI.create('https://test2.corporate.com/repo/content/group/snapshotsIVY')
-        project.repositories.'mavenSnapshotsMVN'.url    == URI.create('https://test2.corporate.com/repo/content/group/snapshotsMVN')
+        project.repositories.'intershopIvyReleasesIVY'.url       == URI.create('https://test2.corporate.com/repo/content/group/releasesIVY')
+        project.repositories.'intershopMavenReleasesMVN'.url     == URI.create('https://test2.corporate.com/repo/content/group/releasesMVN')
+        project.repositories.'intershopIvySnapshotsIVY'.url      == URI.create('https://test2.corporate.com/repo/content/group/snapshotsIVY')
+        project.repositories.'intershopMavenSnapshotsMVN'.url    == URI.create('https://test2.corporate.com/repo/content/group/snapshotsMVN')
     }
 
     def 'repository URLs are configured correctly'() {
@@ -128,10 +128,10 @@ class RepoConfigPluginSpec extends Specification {
         gradle.buildListenerBroadcaster.projectsLoaded(gradle)
 
         then:
-        project.repositories.'ivyReleasesAll'.url       == URI.create('https://test2.corporate.com/repo/content/group/releasesAll')
-        project.repositories.'mavenReleasesAll'.url     == URI.create('https://test2.corporate.com/repo/content/group/releasesAll')
-        project.repositories.'ivySnapshotsAll'.url      == URI.create('https://test2.corporate.com/repo/content/group/snapshotsAll')
-        project.repositories.'mavenSnapshotsAll'.url    == URI.create('https://test2.corporate.com/repo/content/group/snapshotsAll')
+        project.repositories.'intershopIvyReleasesAll'.url       == URI.create('https://test2.corporate.com/repo/content/group/releasesAll')
+        project.repositories.'intershopMavenReleasesAll'.url     == URI.create('https://test2.corporate.com/repo/content/group/releasesAll')
+        project.repositories.'intershopIvySnapshotsAll'.url      == URI.create('https://test2.corporate.com/repo/content/group/snapshotsAll')
+        project.repositories.'intershopMavenSnapshotsAll'.url    == URI.create('https://test2.corporate.com/repo/content/group/snapshotsAll')
         // local repo URLs are tested separately
     }
     
@@ -218,8 +218,8 @@ class RepoConfigPluginSpec extends Specification {
 
         then:
         def location = new File(gradle.gradleUserHomeDir, '.localRepo').toURI()
-        project.repositories.ivyLocal.url == location
-        project.repositories.mavenLocal.url == location
+        project.repositories.intershopIvyLocal.url == location
+        project.repositories.intershopMavenLocal.url == location
     }
     
     def 'local repository location can be configured'() {
@@ -233,8 +233,8 @@ class RepoConfigPluginSpec extends Specification {
 
         then:
         def location = testDir.toURI()
-        project.repositories.ivyLocal.url == location
-        project.repositories.mavenLocal.url == location
+        project.repositories.intershopIvyLocal.url == location
+        project.repositories.intershopMavenLocal.url == location
     }
     
     def 'local publishing is configured for #plugin'(plugin, repo) {
@@ -249,8 +249,8 @@ class RepoConfigPluginSpec extends Specification {
         
         where:
         plugin          | repo
-        'ivy-publish'   | 'ivyLocal'
-        'maven-publish' | 'mavenLocal'
+        'ivy-publish'   | 'intershopIvyLocal'
+        'maven-publish' | 'intershopMavenLocal'
     }
     
     def 'remote repositories to foreign hosts are dropped'() {
