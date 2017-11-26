@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Intershop Communications AG.
+ * Copyright 2017 Intershop Communications AG.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,10 @@
  */
 package com.intershop.gradle.repoconfig
 
+import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
+import groovy.transform.TypeCheckingMode
+import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ConfigurationContainer
@@ -29,6 +32,7 @@ import org.gradle.api.publish.maven.plugins.MavenPublishPlugin
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+@CompileStatic
 class RepoConfigPlugin implements Plugin<Gradle> {
 
     final Logger log = LoggerFactory.getLogger(RepoConfigPlugin)
@@ -39,6 +43,7 @@ class RepoConfigPlugin implements Plugin<Gradle> {
      * This applies the Gradle plugin.
      * @param gradle
      */
+    @TypeChecked(TypeCheckingMode.SKIP)
     void apply (Gradle gradle) {
         initializeSystemPropertiesFromGradleProperties(gradle.gradleUserHomeDir)
         extension = gradle.extensions.create('repositoryConfiguration', RepoConfigExtension)
@@ -94,125 +99,144 @@ class RepoConfigPlugin implements Plugin<Gradle> {
 
 
         int outputProjectCount = 0
-        gradle.allprojects { Project project ->
-            if(outputProjectCount == 0) {
-                println "Defaults for ${extension.getCorporateName() ?: 'project'} are used for inject repositories!"
-                outputProjectCount = 1
-            }
-            if(!config.disableInitDefaults) {
-                if (!config.disableLocalRepository) {
-                    log.debug('Add local repositories for project, build script and publishing for project {}', project.path)
+        gradle.allprojects(new Action<Project>() {
+            @Override
+            void execute(Project project) {
+                if(outputProjectCount == 0) {
+                    println "Defaults for ${extension.getCorporateName() ?: 'project'} are used for inject repositories!"
+                    outputProjectCount = 1
+                }
+                if(!config.disableInitDefaults) {
+                    if (!config.disableLocalRepository) {
+                        log.debug('Add local repositories for project, build script and publishing for project {}', project.path)
 
-                    //add local repo
-                    addLocalRepository(project.repositories, repoPath)
+                        //add local repo
+                        addLocalRepository(project.repositories, repoPath)
 
-                    //add publishing configuration for local development
+                        //add publishing configuration for local development
+                        project.plugins.withType(IvyPublishPlugin) {
+                            project.publishing {
+                                config.addLocalIvyRepo(repositories, repoPath)
+                            }
+                        }
+
+                        project.plugins.withType(MavenPublishPlugin) {
+                            project.publishing {
+                                config.addLocalMavenRepo(repositories, repoPath)
+                            }
+                        }
+
+                        // add log message for users
+                        if (project.gradle.rootProject == project) {
+                            project.logger.warn("The local artifacts are stored in ${repoPath}!")
+                        }
+                    }
+
+                    if(!config.disableBuildscriptLocalRepo) {
+                        log.debug('Add local repositories for build script for project {}', project.path)
+                        //add local repo to build script configuration
+                        addLocalRepository(project.buildscript.repositories, repoPath)
+                    }
+
+                    //add repositories
+                    if (!config.disableRepos) {
+                        log.debug('Add repositories for project build {}', project.path)
+                        addRepositories(project.repositories, project.configurations)
+                    }
+                    //add build script repositories
+                    if (!config.disableBuildscriptRepos) {
+                        log.debug('Add repositories for build script for project {}', project.path)
+                        addRepositories(project.buildscript.repositories, project.buildscript.configurations)
+                    }
+                    //add snapshot repositories
+                    if (config.enableSnapshots) {
+                        log.debug('Add snapshot repositories for project {}', project.path)
+                        addSnapshotsRepositories(project.repositories, project.configurations)
+                    }
+                    //add snapshot repositories to build script configuration
+                    if (config.enableBuildscriptSnapshots) {
+                        log.debug('Add snapshot repositories for build script for project {}', project.path)
+                        addSnapshotsRepositories(project.buildscript.repositories, project.buildscript.configurations)
+                    }
+
+                    addPulicMavenRepository(project.repositories)
+                    addPulicMavenRepository(project.buildscript.repositories)
+
+                    addJCenter(project.repositories)
+                    addJCenter(project.buildscript.repositories)
+                }
+                // set pattern for publishing
+                if (!config.disableIvyPatternPublish) {
                     project.plugins.withType(IvyPublishPlugin) {
                         project.publishing {
-                            config.addLocalIvyRepo(repositories, repoPath)
-                        }
-                    }
-
-                    project.plugins.withType(MavenPublishPlugin) {
-                        project.publishing {
-                            config.addLocalMavenRepo(repositories, repoPath)
-                        }
-                    }
-
-                    // add log message for users
-                    if (project.gradle.rootProject == project) {
-                        project.logger.warn("The local artifacts are stored in ${repoPath}!")
-                    }
-                }
-
-                if(!config.disableBuildscriptLocalRepo) {
-                    log.debug('Add local repositories for build script for project {}', project.path)
-                    //add local repo to build script configuration
-                    addLocalRepository(project.buildscript.repositories, repoPath)
-                }
-
-                //add repositories
-                if (!config.disableRepos) {
-                    log.debug('Add repositories for project build {}', project.path)
-                    addRepositories(project.repositories, project.configurations)
-                }
-                //add build script repositories
-                if (!config.disableBuildscriptRepos) {
-                    log.debug('Add repositories for build script for project {}', project.path)
-                    addRepositories(project.buildscript.repositories, project.buildscript.configurations)
-                }
-                //add snapshot repositories
-                if (config.enableSnapshots) {
-                    log.debug('Add snapshot repositories for project {}', project.path)
-                    addSnapshotsRepositories(project.repositories, project.configurations)
-                }
-                //add snapshot repositories to build script configuration
-                if (config.enableBuildscriptSnapshots) {
-                    log.debug('Add snapshot repositories for build script for project {}', project.path)
-                    addSnapshotsRepositories(project.buildscript.repositories, project.buildscript.configurations)
-                }
-
-                addPulicMavenRepository(project.repositories)
-                addPulicMavenRepository(project.buildscript.repositories)
-
-                addJCenter(project.repositories)
-                addJCenter(project.buildscript.repositories)
-            }
-            // set pattern for publishing
-            if (!config.disableIvyPatternPublish) {
-                project.plugins.withType(IvyPublishPlugin) {
-                    project.publishing {
-                        repositories.withType(IvyArtifactRepository) { IvyArtifactRepository repo ->
-                            repo.layout('pattern') {
-                                ivy config.ivyPattern
-                                artifact config.artifactPattern
+                            repositories.withType(IvyArtifactRepository) { IvyArtifactRepository repo ->
+                                if(repo.name.startsWith('intershop')) {
+                                    log.debug("Add pattern to {}", repo.name)
+                                    repo.layout('pattern') {
+                                        ivy config.ivyPattern
+                                        artifact config.artifactPattern
+                                    }
+                                } else {
+                                    log.debug("Pattern will be not added to {}.", repo.name)
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            //set pattern for buildscript repositories
-            if(! config.disableIvyPatternBuildscript) {
-                project.repositories.withType(IvyArtifactRepository) { IvyArtifactRepository repo ->
-                    repo.layout('pattern') {
-                        ivy config.ivyPattern
-                        artifact config.artifactPattern
-                        artifact config.ivyAsAnArtifactPattern
+                //set pattern for buildscript repositories
+                if(! config.disableIvyPatternBuildscript) {
+                    project.repositories.withType(IvyArtifactRepository) { IvyArtifactRepository repo ->
+                        if(repo.name.startsWith('intershop')) {
+                            log.debug("Add pattern to {}", repo.name)
+                            repo.layout('pattern') {
+                                ivy config.ivyPattern
+                                artifact config.artifactPattern
+                                artifact config.ivyAsAnArtifactPattern
+                            }
+                        } else {
+                            log.debug("Pattern will be not added to {}.", repo.name)
+                        }
                     }
                 }
-            }
-            //set pattern for repositories
-            if(! config.disableIvyPattern) {
-                project.buildscript.repositories.withType(IvyArtifactRepository) { IvyArtifactRepository repo ->
-                    repo.layout('pattern') {
-                        ivy config.ivyPattern
-                        artifact config.artifactPattern
-                        artifact config.ivyAsAnArtifactPattern
+                //set pattern for repositories
+                if(! config.disableIvyPattern) {
+                    project.buildscript.repositories.withType(IvyArtifactRepository) { IvyArtifactRepository repo ->
+                        if(repo.name.startsWith('intershop')) {
+                            log.debug("Add pattern to {}", repo.name)
+                            repo.layout('pattern') {
+                                ivy config.ivyPattern
+                                artifact config.artifactPattern
+                                artifact config.ivyAsAnArtifactPattern
+                            }
+                        } else {
+                            log.debug("Pattern will be not added to {}.", repo.name)
+                        }
                     }
                 }
-            }
 
-            // Remove repositories that are non-local and pointing to our repository server or not maven or ivy repositories
-            project.repositories.all { ArtifactRepository repo ->
-                if (!(repo instanceof MavenArtifactRepository) && !(repo instanceof IvyArtifactRepository)) {
-                    project.repositories.remove repo
-                    project.logger.warn("Repository '{}' of type '{}' on project '{}' removed. Only Maven und Ivy repositories are allowed.",
-                            repo.name, repo.getClass().name, project.path)
-                } else if (extension.getRepoHostList() && ! extension.getRepoHostList().isEmpty() && repo.url && !(repo.url.host.toString() in extension.getRepoHostList()) && !(repo.url.scheme == 'file')) {
-                    project.repositories.remove repo
-                    project.logger.warn("Repository '{}' with url '{}' removed from project '{}'. Only repositories on '{}' are allowed.",
-                            repo.name, repo.url, project.path, extension.getRepoHostList().join(','))
+                // Remove repositories that are non-local and pointing to our repository server or not maven or ivy repositories
+                project.repositories.all { ArtifactRepository repo ->
+                    if (!(repo instanceof MavenArtifactRepository) && !(repo instanceof IvyArtifactRepository)) {
+                        project.repositories.remove repo
+                        project.logger.warn("Repository '{}' of type '{}' on project '{}' removed. Only Maven und Ivy repositories are allowed.",
+                                repo.name, repo.getClass().name, project.path)
+                    } else if (extension.getRepoHostList() && ! extension.getRepoHostList().isEmpty() && repo.url && !(repo.url.host.toString() in extension.getRepoHostList()) && !(repo.url.scheme == 'file')) {
+                        project.repositories.remove repo
+                        project.logger.warn("Repository '{}' with url '{}' removed from project '{}'. Only repositories on '{}' are allowed.",
+                                repo.name, repo.url, project.path, extension.getRepoHostList().join(','))
+                    }
+                }
+
+                //add project properties
+                project.ext {
+                    corporateIvyPattern = config.ivyPattern
+                    corporateArtifactPattern = config.artifactPattern
+                    corporateIvyAsArtifactPattern = config.ivyAsAnArtifactPattern
                 }
             }
+        })
 
-            //add project properties
-            project.ext {
-                corporateIvyPattern = config.ivyPattern
-                corporateArtifactPattern = config.artifactPattern
-                corporateIvyAsArtifactPattern = config.ivyAsAnArtifactPattern
-            }
-        }
     }
 
     /**
@@ -220,7 +244,6 @@ class RepoConfigPlugin implements Plugin<Gradle> {
      * @param repositories
      * @param configurations
      */
-    @TypeChecked
     private void addJCenter(RepositoryHandler repositories) {
         if(extension.activateJCenter) {
             log.debug('Add JCenter repository if activateJCenter is true')
@@ -240,7 +263,6 @@ class RepoConfigPlugin implements Plugin<Gradle> {
      * @param repositories
      * @param configurations
      */
-    @TypeChecked
     private void addPulicMavenRepository(RepositoryHandler repositories) {
         log.debug('Add maven repository {}', extension.getPublicMavenRepo())
         config.addMavenRepo(repositories, extension.getPublicMavenRepo(), '', '')
@@ -259,7 +281,6 @@ class RepoConfigPlugin implements Plugin<Gradle> {
      * @param repositories
      * @param configurations
      */
-    @TypeChecked
     private void addSnapshotsRepositories(RepositoryHandler repositories, ConfigurationContainer configurations) {
         if(extension.getIvySnapshotRepo()) {
             // add default repositories
@@ -290,7 +311,6 @@ class RepoConfigPlugin implements Plugin<Gradle> {
      * @param repositories
      * @param configurations
      */
-    @TypeChecked
     private void addRepositories(RepositoryHandler repositories, ConfigurationContainer configurations) {
         if(extension.getIvyReleaseRepo()) {
             // add default repositories
@@ -322,7 +342,6 @@ class RepoConfigPlugin implements Plugin<Gradle> {
      * @param repositories
      * @param path
      */
-    @TypeChecked
     private void addLocalRepository(RepositoryHandler repositories, String path) {
         log.debug('Add ivy repository {}', path)
         config.addLocalIvyRepo(repositories, path)
@@ -330,8 +349,7 @@ class RepoConfigPlugin implements Plugin<Gradle> {
         config.addLocalMavenRepo(repositories, path)
     }
 
-    @TypeChecked
-    private void initializeSystemPropertiesFromGradleProperties(File gradleUserHome) {
+    private static void initializeSystemPropertiesFromGradleProperties(File gradleUserHome) {
         // load gradle.properties
         def gradlePropsFile = new File(gradleUserHome, 'gradle.properties')
         if (!gradlePropsFile.exists())
