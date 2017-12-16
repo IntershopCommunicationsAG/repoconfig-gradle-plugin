@@ -1,11 +1,13 @@
 = Repository Configuration Init Script Plugin
-:latestRevision: 3.3.0
+:latestRevision: 4.1.0
 :toc:
+:icons: font
+
+NOTE: Version 3 of this plugin will only work with Gradle 4 and JDK 8.
 
 == Summary
 This is an init script plugin to provide special repository settings for project teams or companies.
 See https://docs.gradle.org/current/userguide/init_scripts.html and http://gradle.org/standardizing-enterprise-builds-with-gradle/.
-With this plugin it is also possible to inject repository configurations easily in a settings.gradle file.
 See https://docs.gradle.org/current/userguide/init_scripts.html[Initialization Scripts].
 
 == Usage
@@ -46,11 +48,10 @@ repositoryConfiguration {
 ----
 
 This plugin applies the following configurations and properties to all projects with the same init.gradle script.
-Furthermore it adds one method to the Gradle object.
 
 .Ivy configuration
-These Ivy patterns will be applied to all configured Ivy repositories  - read, build script and publishing configurations.
-These patterns will be also stored in Gradle and project properties.
+These Ivy patterns will be applied to all configured Ivy repositories  - read, build script and publishing
+configurations if the name starts with 'intershop'.
 
 * Ivy pattern +
 pattern: `'[organisation]/[module]/[revision]/[type]s/ivy-[revision].xml'` +
@@ -61,29 +62,6 @@ property: `corporateArtifactPattern`
 * Artifact pattern for ivy files +
 pattern: `'[organisation]/[module]/[revision]/[type]s/ivy-[revision].xml'` +
 property: `corporateIvyAsArtifactPattern`
-
-.Extension for Gradle object with method `injectRepositories`
-This method can be used to add repositories to existing repository containers.
-
-.settings.gradle (example)
-[source,groovy,subs="attributes"]
-----
-buildscript {
-    gradle.injectRepositories(repositories, configurations)
-    dependencies {
-        classpath 'com.intershop:deployment-bootstrap:2.7.0'
-    }
-}
-
-apply plugin: com.intershop.deploy.bootstrap.DeploymentBootstrapPlugin
-
-deploymentBootstrap {
-    gradle.injectRepositories(repositoryHandler, configurationContainer)
-
-    assembly (installAssembly) {
-
-    ...
-----
 
 == Init Script Extension 'repositoryConfiguration'
 === Properties
@@ -105,15 +83,6 @@ deploymentBootstrap {
 |*`pulicMavenRepo`* |`String`  | `null` |  | repository URL of a repository or repository group with Maven artifacts. This can be used for a public Maven repository. The host of this repository is added to the list of allowed hosts automatically.
 |*`activateJCenter`* |`boolean`  | `false` |  | If this value is true, JCenter will be added to the list of repsoitories. The host of this repository is added to the list of allowed hosts automatically.
 
-|===
-
-== Gradle Extension
-=== Methods
-[cols="20%,15%,65%", width="95%", options="header"]
-|===
-|Method | Parameters | Description
-|*injectRepositories* | RepositoryHandler, ConfigurationContainer | See https://docs.gradle.org/current/javadoc/org/gradle/api/artifacts/dsl/RepositoryHandler.html[RepositoryHandler] and
-https://docs.gradle.org/current/javadoc/org/gradle/api/artifacts/ConfigurationContainer.html[ConfigurationContainer] in Gradle standard documentation.
 |===
 
 === Additional Environment or System Variables
@@ -144,12 +113,7 @@ For special use cases it is necessary to enable or disable special sets of repos
 |`DISABLE_INITDEFAULTS`|`disableInitDefaults`|`false`|If true, all default settings are disabled.
 |`ENABLE_SNAPSHOTS`    |`enableSnapshots`    |`false`|If true, snapshot repositories (`ivy.snapshots.pathList`, `maven.snapshots.pathList`) will be enabled for build dependencies.
 |`DISABLE_REPOS`       |`disableRepos`       |`false`|If true, repositories from `ivy.repository.pathList` and `maven.repository.pathList` will be disabled for build dependencies.
-|`ENABLE_BUILDSCRIPT_SNAPSHOTS` |`enableBuildscriptSnapshots` |`false`|If true, snapshot repositories (`ivy.snapshots.pathList`, `maven.snapshots.pathList`) will be enabled for buildscript dependencies.
-|`DISABLE_BUILDSCRIPT_REPOS`    |`disableBuildscriptRepos`    |`false`|If true, repositories from `ivy.repository.pathList` and `maven.repository.pathList` will be disabled for buildscript dependencies.
 |`DISABLE_LOCAL_REPO`  |`disableLocalRepo`   |`false`|If true, default configuration for local repository is disabled.
-|`DISABLE_IVYPATTERN_PUBLISH`   |`disableIvyPatternPublish`   |`false`|If true, the default ivy pattern will be disabled for all publish configurations.
-|`DISABLE_IVYPATTERN_BUILDSCRIPT`   |`disableIvyPatternBuildscript`   |`false`|If true, the default ivy pattern will be disabled for all buildscript configurations.
-|`DISABLE_IVYPATTERN`  |`disableIvyPattern`  |`false`|If true, the default ivy pattern will be disabled for all build configurations.
 |===
 
 == License

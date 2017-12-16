@@ -68,7 +68,7 @@ class RepoConfigPluginSpec extends Specification {
         project.buildscript.repositories.empty
     }
 
-    def 'extension properties are added for #object'(object) {
+    def 'extension properties are added for project'() {
         when:
         gradle.apply plugin: RepoConfigPlugin
         gradle.repositoryConfiguration.releaseRepo = 'https://test2.corporate.com/repo/content/group/releasesAll'
@@ -79,13 +79,9 @@ class RepoConfigPluginSpec extends Specification {
         gradle.buildListenerBroadcaster.projectsLoaded(gradle)
 
         then:
-        def it = this."$object"
-        it.corporateIvyPattern == RepoConfigRegistry.ivyPattern
-        it.corporateArtifactPattern == RepoConfigRegistry.artifactPattern
-        it.corporateIvyAsArtifactPattern == RepoConfigRegistry.ivyAsAnArtifactPattern
-
-        where:
-        object << ['project', 'gradle']
+        project.corporateIvyPattern == RepoConfigRegistry.ivyPattern
+        project.corporateArtifactPattern == RepoConfigRegistry.artifactPattern
+        project.corporateIvyAsArtifactPattern == RepoConfigRegistry.ivyAsAnArtifactPattern
     }
 
     def 'repository URLs are configured correctly (ivy/mvn)'() {
@@ -150,12 +146,7 @@ class RepoConfigPluginSpec extends Specification {
         
         then: 'project repos are configured'
         project.repositories*.name as Set == repos as Set
-        
-        and: 'injectRepositories adds those repos'
-        def other = ProjectBuilder.builder().build()
-        gradle.injectRepositories(other.repositories, other.configurations)
-        other.repositories*.name as Set == repos as Set
-        
+
         where:
         description          | flag               | toggle | repos
         'be configured'      | 'disableRepos'     | false  | IVY + IVY_LOCAL + MAVEN + MAVEN_LOCAL
@@ -164,32 +155,6 @@ class RepoConfigPluginSpec extends Specification {
         'use snapshots'      | 'enableSnapshots'  | true   | IVY + IVY_SNAPSHOT + IVY_LOCAL + MAVEN + MAVEN_SNAPSHOT + MAVEN_LOCAL
         // default for disableLocalRepo is false
         'disable local repo' | 'disableLocalRepo' | true   | IVY + MAVEN
-    }
-    
-    def 'buildscript repositories can #description'(description, flag, toggle, repos) {
-        given:
-        System.properties[flag] = toggle
-        
-        when:
-        gradle.apply plugin: RepoConfigPlugin
-        gradle.repositoryConfiguration.releaseRepo = 'https://test2.corporate.com/repo/content/group/releasesAll'
-        gradle.repositoryConfiguration.snapshotRepo = 'https://test2.corporate.com/repo/content/group/snapshotsAll'
-        gradle.repositoryConfiguration.repoHostList = ['test1.corporate.com', 'test2.corporate.com']
-        gradle.repositoryConfiguration.corporateName = 'test2 corporation'
-        // explicitly trigger event, required for gradle.allprojects { }
-        gradle.buildListenerBroadcaster.projectsLoaded(gradle)
-
-        then:
-        project.buildscript.repositories*.name as Set == repos as Set
-        
-        where:
-        description          | flag                          | toggle | repos
-        'be configured'      | 'disableBuildscriptRepos'     | false  | IVY + IVY_LOCAL + MAVEN + MAVEN_LOCAL
-        'be disabled'        | 'disableBuildscriptRepos'     | true   | IVY_LOCAL + MAVEN_LOCAL
-        // default for enableBuildscriptSnapshots is false
-        'use snapshots'      | 'enableBuildscriptSnapshots'  | true   | IVY + IVY_SNAPSHOT + IVY_LOCAL + MAVEN + MAVEN_SNAPSHOT + MAVEN_LOCAL
-        // default for disableLocalRepo is false
-        'disable local repo' | 'disableBuildscriptLocalRepo' | true   | IVY + MAVEN
     }
     
     def 'local repositories are considered first'() {

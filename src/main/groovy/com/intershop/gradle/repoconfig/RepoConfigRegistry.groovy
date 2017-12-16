@@ -66,46 +66,10 @@ class RepoConfigRegistry {
     final static String DISABLE_REPOS_SYS = 'DISABLE_REPOS'
 
     /*
-     * Settings for enable all build script snapshot repositories
-     */
-    final static String ENABLE_BUILDSCIPT_SNAPSHOTS_ENV = 'enableBuildscriptSnapshots'
-    final static String ENABLE_BUILDSCIPT_SNAPSHOTS_SYS = 'ENABLE_BUILDSCRIPT_SNAPSHOTS'
-
-    /*
-     * Settings for disable all other build script repositories
-     */
-    final static String DISABLE_BUILDSCIPT_REPOS_ENV = 'disableBuildscriptRepos'
-    final static String DISABLE_BUILDSCIPT_REPOS_SYS = 'DISABLE_BUILDSCRIPT_REPOS'
-
-    /*
-     * Settings for disable local build script repositories
-     */
-    final static String DISABLE_BUILDSCIPT_LOCAL_REPO_ENV = 'disableBuildscriptLocalRepo'
-    final static String DISABLE_BUILDSCIPT_LOCAL_REPO_SYS = 'DISABLE_BUILDSCRIPT_LOCAL_REPO'
-
-    /*
      * Setting for disable local repository publishing and usage
      */
     final static String DISABLE_LOCAL_REPO_ENV = 'disableLocalRepo'
     final static String DISABLE_LOCAL_REPO_SYS = 'DISABLE_LOCAL_REPO'
-
-    /*
-     * Setting for disable publish ivy pattern
-     */
-    final static String DISABLE_IVYPATTERN_PUBLISH_ENV = 'disableIvyPatternPublish'
-    final static String DISABLE_IVYPATTERN_PUBLISH_SYS = 'DISABLE_IVYPATTERN_PUBLISH'
-
-    /*
-     * Setting for disable buildscript ivy pattern
-     */
-    final static String DISABLE_IVYPATTERN_BUILDSCRIPT_ENV = 'disableIvyPatternBuildscript'
-    final static String DISABLE_IVYPATTERN_BUILDSCRIPT_SYS = 'DISABLE_IVYPATTERN_BUILDSCRIPT'
-
-    /*
-     * Setting for disable buildscript ivy pattern
-     */
-    final static String DISABLE_IVYPATTERN_ENV = 'disableIvyPattern'
-    final static String DISABLE_IVYPATTERN_SYS = 'DISABLE_IVYPATTERN'
 
     /*
      * Setting for local repository path
@@ -136,44 +100,14 @@ class RepoConfigRegistry {
     final boolean disableRepos
 
     /**
-     * Disable usage of repositories for the buildscript configuration
-     */
-    final boolean disableBuildscriptRepos
-
-    /**
      * Enable usage of snapshot repositories
      */
     final boolean enableSnapshots
 
     /**
-     * Enable usage of snapshot repositories for the buildscript configuration
-     */
-    final boolean enableBuildscriptSnapshots
-
-    /**
      * Disable usage of local repository
      */
     final boolean disableLocalRepository
-
-    /**
-     * Disable usage of local repository for build scripts
-     */
-    final boolean disableBuildscriptLocalRepo
-
-    /**
-     * Disable corporate ivy pattern for publishing
-     */
-    final boolean disableIvyPatternPublish
-
-    /**
-     * Disable corporate ivy pattern for Buildscript repositories
-     */
-    final boolean disableIvyPatternBuildscript
-
-    /**
-     * Disable corporate ivy pattern for build repositories
-     */
-    final boolean disableIvyPattern
 
     /**
      * Path for local repository
@@ -187,18 +121,11 @@ class RepoConfigRegistry {
         disableInitDefaults = getConfigurationValue(DISABLE_DEFAULTS_ENV, DISABLE_DEFAULTS_SYS, 'false').toBoolean()
 
         disableRepos = getConfigurationValue(DISABLE_REPOS_ENV, DISABLE_REPOS_SYS, 'false').toBoolean()
-        disableBuildscriptRepos = getConfigurationValue(DISABLE_BUILDSCIPT_REPOS_ENV, DISABLE_BUILDSCIPT_REPOS_SYS, 'false').toBoolean()
 
         enableSnapshots = getConfigurationValue(ENABLE_SNAPSHOTS_ENV, ENABLE_SNAPSHOTS_SYS, 'false').toBoolean()
-        enableBuildscriptSnapshots = getConfigurationValue(ENABLE_BUILDSCIPT_SNAPSHOTS_ENV, ENABLE_BUILDSCIPT_SNAPSHOTS_SYS, 'false').toBoolean()
 
         disableLocalRepository = getConfigurationValue(DISABLE_LOCAL_REPO_ENV, DISABLE_LOCAL_REPO_SYS, 'false').toBoolean()
-        disableBuildscriptLocalRepo = getConfigurationValue(DISABLE_BUILDSCIPT_LOCAL_REPO_ENV, DISABLE_BUILDSCIPT_LOCAL_REPO_SYS, 'false').toBoolean()
         localRepositoryPath = getConfigurationValue(LOCAL_REPO_PATH_ENV, LOCAL_REPO_PATH_SYS, '')
-
-        disableIvyPatternPublish = getConfigurationValue(DISABLE_IVYPATTERN_PUBLISH_ENV, DISABLE_IVYPATTERN_PUBLISH_SYS, 'false').toBoolean()
-        disableIvyPatternBuildscript = getConfigurationValue(DISABLE_IVYPATTERN_BUILDSCRIPT_ENV, DISABLE_IVYPATTERN_BUILDSCRIPT_SYS, 'false').toBoolean()
-        disableIvyPattern = getConfigurationValue(DISABLE_IVYPATTERN_ENV, DISABLE_IVYPATTERN_SYS, 'false').toBoolean()
     }
 
     /**
