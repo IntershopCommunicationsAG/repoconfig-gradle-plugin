@@ -3,7 +3,7 @@
 :toc:
 :icons: font
 
-NOTE: Version 3 of this plugin will only work with Gradle 4 and JDK 8.
+NOTE: Version 4 of this plugin will only work with Gradle 4 and JDK 8.
 
 == Summary
 This is an init script plugin to provide special repository settings for project teams or companies.
