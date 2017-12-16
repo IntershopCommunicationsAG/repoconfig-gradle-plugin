@@ -53,51 +53,6 @@ class RepoConfigPlugin implements Plugin<Gradle> {
         // default local repo path
         String repoPath = config.localRepositoryPath ?: (new File(gradle.gradleUserHomeDir, '.localRepo')).canonicalPath
 
-        if (!config.disableInitDefaults) {
-            // add repositories to settings gradle repositories configuration
-            int outputGradleCount = 0
-            gradle.ext.injectRepositories = { RepositoryHandler repositories, ConfigurationContainer configurations ->
-                if(outputGradleCount == 0) {
-                    println "Defaults for ${extension.getCorporateName() ?: 'project'} are used for inject repositories!"
-                    outputGradleCount = 1
-                }
-                // local repository
-                if(! config.disableLocalRepository) {
-                    addLocalRepository(repositories, repoPath)
-                }
-                // repositories
-                if (!config.disableRepos) {
-                    addRepositories(repositories, configurations)
-                }
-                // snapshot repositories
-                if (config.enableSnapshots) {
-                    addSnapshotsRepositories(repositories, configurations)
-                }
-
-                addPulicMavenRepository(repositories)
-                addJCenter(repositories)
-
-                // add pattern
-                if(! config.disableIvyPattern) {
-                    repositories.withType(IvyArtifactRepository) { IvyArtifactRepository repo ->
-                        repo.layout('pattern') {
-                            ivy config.ivyPattern
-                            artifact config.artifactPattern
-                            artifact config.ivyAsAnArtifactPattern
-                        }
-                    }
-                }
-            }
-        }
-
-        // add gradle properties
-        gradle.ext {
-            corporateIvyPattern = config.ivyPattern
-            corporateArtifactPattern = config.artifactPattern
-            corporateIvyAsArtifactPattern = config.ivyAsAnArtifactPattern
-        }
-
-
         int outputProjectCount = 0
         gradle.allprojects(new Action<Project>() {
             @Override
@@ -132,31 +87,15 @@ class RepoConfigPlugin implements Plugin<Gradle> {
                         }
                     }
 
-                    if(!config.disableBuildscriptLocalRepo) {
-                        log.debug('Add local repositories for build script for project {}', project.path)
-                        //add local repo to build script configuration
-                        addLocalRepository(project.buildscript.repositories, repoPath)
-                    }
-
                     //add repositories
                     if (!config.disableRepos) {
                         log.debug('Add repositories for project build {}', project.path)
                         addRepositories(project.repositories, project.configurations)
                     }
-                    //add build script repositories
-                    if (!config.disableBuildscriptRepos) {
-                        log.debug('Add repositories for build script for project {}', project.path)
-                        addRepositories(project.buildscript.repositories, project.buildscript.configurations)
-                    }
                     //add snapshot repositories
                     if (config.enableSnapshots) {
                         log.debug('Add snapshot repositories for project {}', project.path)
                         addSnapshotsRepositories(project.repositories, project.configurations)
-                    }
-                    //add snapshot repositories to build script configuration
-                    if (config.enableBuildscriptSnapshots) {
-                        log.debug('Add snapshot repositories for build script for project {}', project.path)
-                        addSnapshotsRepositories(project.buildscript.repositories, project.buildscript.configurations)
                     }
 
                     addPulicMavenRepository(project.repositories)
@@ -166,7 +105,6 @@ class RepoConfigPlugin implements Plugin<Gradle> {
                     addJCenter(project.buildscript.repositories)
                 }
                 // set pattern for publishing
-                if (!config.disableIvyPatternPublish) {
                     project.plugins.withType(IvyPublishPlugin) {
                         project.publishing {
                             repositories.withType(IvyArtifactRepository) { IvyArtifactRepository repo ->
@@ -182,10 +120,10 @@ class RepoConfigPlugin implements Plugin<Gradle> {
                             }
                         }
                     }
-                }
+
 
                 //set pattern for buildscript repositories
-                if(! config.disableIvyPatternBuildscript) {
+
                     project.repositories.withType(IvyArtifactRepository) { IvyArtifactRepository repo ->
                         if(repo.name.startsWith('intershop')) {
                             log.debug("Add pattern to {}", repo.name)
@@ -198,9 +136,9 @@ class RepoConfigPlugin implements Plugin<Gradle> {
                             log.debug("Pattern will be not added to {}.", repo.name)
                         }
                     }
-                }
+
                 //set pattern for repositories
-                if(! config.disableIvyPattern) {
+
                     project.buildscript.repositories.withType(IvyArtifactRepository) { IvyArtifactRepository repo ->
                         if(repo.name.startsWith('intershop')) {
                             log.debug("Add pattern to {}", repo.name)
@@ -213,7 +151,7 @@ class RepoConfigPlugin implements Plugin<Gradle> {
                             log.debug("Pattern will be not added to {}.", repo.name)
                         }
                     }
-                }
+
 
                 // Remove repositories that are non-local and pointing to our repository server or not maven or ivy repositories
                 project.repositories.all { ArtifactRepository repo ->
