@@ -105,53 +105,49 @@ class RepoConfigPlugin implements Plugin<Gradle> {
                     addJCenter(project.buildscript.repositories)
                 }
                 // set pattern for publishing
-                    project.plugins.withType(IvyPublishPlugin) {
-                        project.publishing {
-                            repositories.withType(IvyArtifactRepository) { IvyArtifactRepository repo ->
-                                if(repo.name.startsWith('intershop')) {
-                                    log.debug("Add pattern to {}", repo.name)
-                                    repo.layout('pattern') {
-                                        ivy config.ivyPattern
-                                        artifact config.artifactPattern
-                                    }
-                                } else {
-                                    log.debug("Pattern will be not added to {}.", repo.name)
+                project.plugins.withType(IvyPublishPlugin) {
+                    project.publishing {
+                        repositories.withType(IvyArtifactRepository) { IvyArtifactRepository repo ->
+                            if(repo.name.startsWith('intershop')) {
+                                log.debug("Add pattern to {}", repo.name)
+                                repo.layout('pattern') {
+                                    ivy config.ivyPattern
+                                    artifact config.artifactPattern
                                 }
+                            } else {
+                                log.debug("Pattern will be not added to {}.", repo.name)
                             }
                         }
                     }
-
+                }
 
                 //set pattern for buildscript repositories
-
-                    project.repositories.withType(IvyArtifactRepository) { IvyArtifactRepository repo ->
-                        if(repo.name.startsWith('intershop')) {
-                            log.debug("Add pattern to {}", repo.name)
-                            repo.layout('pattern') {
-                                ivy config.ivyPattern
-                                artifact config.artifactPattern
-                                artifact config.ivyAsAnArtifactPattern
-                            }
-                        } else {
-                            log.debug("Pattern will be not added to {}.", repo.name)
+                project.repositories.withType(IvyArtifactRepository) { IvyArtifactRepository repo ->
+                    if(repo.name.startsWith('intershop')) {
+                        log.debug("Add pattern to {}", repo.name)
+                        repo.layout('pattern') {
+                            ivy config.ivyPattern
+                            artifact config.artifactPattern
+                            artifact config.ivyAsAnArtifactPattern
                         }
+                    } else {
+                        log.debug("Pattern will be not added to {}.", repo.name)
                     }
+                }
 
                 //set pattern for repositories
-
-                    project.buildscript.repositories.withType(IvyArtifactRepository) { IvyArtifactRepository repo ->
-                        if(repo.name.startsWith('intershop')) {
-                            log.debug("Add pattern to {}", repo.name)
-                            repo.layout('pattern') {
-                                ivy config.ivyPattern
-                                artifact config.artifactPattern
-                                artifact config.ivyAsAnArtifactPattern
-                            }
-                        } else {
-                            log.debug("Pattern will be not added to {}.", repo.name)
+                project.buildscript.repositories.withType(IvyArtifactRepository) { IvyArtifactRepository repo ->
+                    if(repo.name.startsWith('intershop')) {
+                        log.debug("Add pattern to {}", repo.name)
+                        repo.layout('pattern') {
+                            ivy config.ivyPattern
+                            artifact config.artifactPattern
+                            artifact config.ivyAsAnArtifactPattern
                         }
+                    } else {
+                        log.debug("Pattern will be not added to {}.", repo.name)
                     }
-
+                }
 
                 // Remove repositories that are non-local and pointing to our repository server or not maven or ivy repositories
                 project.repositories.all { ArtifactRepository repo ->

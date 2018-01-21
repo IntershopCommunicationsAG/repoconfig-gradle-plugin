@@ -12,7 +12,7 @@ plugins {
     id 'maven-publish'
 
     // intershop version plugin
-    id 'com.intershop.gradle.scmversion' version '3.2.0'
+    id 'com.intershop.gradle.scmversion' version '3.4.0'
 
     // plugin for documentation
     id 'org.asciidoctor.convert' version '1.5.3'
@@ -34,6 +34,15 @@ scm {
 group 'com.intershop.gradle.repoconfig'
 description 'Repository Configuration Init Script Plugin for project teams or companies'
 version = scm.version.version
+
+gradlePlugin {
+    plugins {
+        repoconfigurationPlugin {
+            id = 'com.intershop.gradle.repoconfig'
+            implementationClass = 'com.intershop.gradle.repoconfig.RepoConfigPlugin'
+        }
+    }
+}
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8

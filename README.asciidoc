@@ -1,5 +1,5 @@
 = Repository Configuration Init Script Plugin
-:latestRevision: 4.1.0
+:latestRevision: 4.2.0
 :toc:
 :icons: font
 
