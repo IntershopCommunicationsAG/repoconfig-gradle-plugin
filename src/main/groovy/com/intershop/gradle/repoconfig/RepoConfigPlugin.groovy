@@ -110,7 +110,7 @@ class RepoConfigPlugin implements Plugin<Gradle> {
                         repositories.withType(IvyArtifactRepository) { IvyArtifactRepository repo ->
                             if(repo.name.startsWith('intershop')) {
                                 log.debug("Add pattern to {}", repo.name)
-                                repo.layout('pattern') {
+                                repo.patternLayout {
                                     ivy config.ivyPattern
                                     artifact config.artifactPattern
                                 }
@@ -125,7 +125,7 @@ class RepoConfigPlugin implements Plugin<Gradle> {
                 project.repositories.withType(IvyArtifactRepository) { IvyArtifactRepository repo ->
                     if(repo.name.startsWith('intershop')) {
                         log.debug("Add pattern to {}", repo.name)
-                        repo.patternLayout('pattern') {
+                        repo.patternLayout {
                             ivy config.ivyPattern
                             artifact config.artifactPattern
                             artifact config.ivyAsAnArtifactPattern
@@ -139,7 +139,7 @@ class RepoConfigPlugin implements Plugin<Gradle> {
                 project.buildscript.repositories.withType(IvyArtifactRepository) { IvyArtifactRepository repo ->
                     if(repo.name.startsWith('intershop')) {
                         log.debug("Add pattern to {}", repo.name)
-                        repo.layout('pattern') {
+                        repo.patternLayout {
                             ivy config.ivyPattern
                             artifact config.artifactPattern
                             artifact config.ivyAsAnArtifactPattern

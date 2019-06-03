@@ -55,7 +55,7 @@ if (project.version.endsWith('-SNAPSHOT')) {
 test {
     systemProperty 'intershop.classpath',  project.sourceSets.main.output.getClassesDirs().getAsPath()
     // Gradle versions for test
-    systemProperty 'intershop.gradle.versions', '4.4,4.9'
+    systemProperty 'intershop.gradle.versions', '5.4'
 }
 
 task copyAsciiDoc {

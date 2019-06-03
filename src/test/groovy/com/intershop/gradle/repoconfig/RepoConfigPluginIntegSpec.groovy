@@ -48,6 +48,10 @@ class RepoConfigPluginIntegSpec extends AbstractIntegrationSpec {
         }
         """.stripIndent()
 
+        new File(testProjectDir, 'settings.gradle') << """\
+        rootProject.name = 'corporateplugin'
+        """.stripIndent()
+
         buildFile << """
         // provide some configurations etc.
         apply plugin: 'java'
@@ -96,6 +100,10 @@ class RepoConfigPluginIntegSpec extends AbstractIntegrationSpec {
             repoHostList = ['test1.corporate.com', 'test2.corporate.com']
             corporateName = 'test2 corporation'
         }
+        """.stripIndent()
+
+        new File(testProjectDir, 'settings.gradle') << """\
+        rootProject.name = 'corporateplugin'
         """.stripIndent()
 
         buildFile << """
