@@ -101,6 +101,9 @@ class RepoConfigPlugin implements Plugin<Gradle> {
                     addPulicMavenRepository(project.repositories)
                     addPulicMavenRepository(project.buildscript.repositories)
 
+                    addMavenCentral(project.repositories)
+                    addMavenCentral(project.buildscript.repositories)
+
                     addJCenter(project.repositories)
                     addJCenter(project.buildscript.repositories)
                 }
@@ -188,6 +191,25 @@ class RepoConfigPlugin implements Plugin<Gradle> {
                 }
             } catch (Exception ex) {
                 log.info("This is not a URL or there is no host in jcenter configuration.", extension.getPublicMavenRepo())
+            }
+        }
+    }
+
+        /**
+     * Add an additional Maven repository configurations
+     * @param repositories
+     * @param configurations
+     */
+    private void addMavenCentral(RepositoryHandler repositories) {
+        if(extension.activateMavenCentral) {
+            log.debug('Add mavenCentral repository if activateMavenCentral is true')
+            MavenArtifactRepository repo = repositories.mavenCentral()
+            try {
+                if( extension.getRepoHostList() && ! extension.getRepoHostList().isEmpty() ) {
+                    extension.getRepoHostList().add(repo.url.getHost().toString())
+                }
+            } catch (Exception ex) {
+                log.info("This is not a URL or there is no host in mavenCentral configuration.", extension.getPublicMavenRepo())
             }
         }
     }

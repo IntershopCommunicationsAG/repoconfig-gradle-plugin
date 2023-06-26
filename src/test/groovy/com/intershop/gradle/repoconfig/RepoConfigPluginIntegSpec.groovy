@@ -43,6 +43,7 @@ class RepoConfigPluginIntegSpec extends AbstractIntegrationSpec {
             snapshotRepo = 'https://test2.corporate.com/repo/content/group/snapshotsAll'
             publicMavenRepo = 'https://maven.repo.com/maven'
             activateJCenter = true
+            activateMavenCentral = true
             repoHostList = ['test1.corporate.com', 'test2.corporate.com']
             corporateName = 'test2 corporation'
         }
@@ -58,7 +59,7 @@ class RepoConfigPluginIntegSpec extends AbstractIntegrationSpec {
         apply plugin: 'ivy-publish'
         apply plugin: 'maven-publish'
 
-        assert repositories*.name as Set == ['intershopIvyLocal', 'intershopMavenLocal', 'intershopIvyReleasesAll', 'intershopMavenReleasesAll', 'intershopMavenMaven', 'BintrayJCenter'] as Set
+        assert repositories*.name as Set == ['intershopIvyLocal', 'intershopMavenLocal', 'intershopIvyReleasesAll', 'intershopMavenReleasesAll', 'intershopMavenMaven', 'MavenRepo', 'BintrayJCenter'] as Set
         assert publishing.repositories*.name as Set == ['intershopIvyLocal', 'intershopMavenLocal'] as Set
         """.stripIndent()
         
@@ -123,6 +124,61 @@ class RepoConfigPluginIntegSpec extends AbstractIntegrationSpec {
                 .withGradleVersion(gradleVersion)
                 .build()
 
+        then:
+        noExceptionThrown()
+
+        where:
+        gradleVersion << supportedGradleVersions
+    }
+
+     def 'CorporatePlugin is compatible with Gradle and without MavenCentral #gradleVersion'(gradleVersion) {
+
+        given:
+        String libs = ''
+        System.getProperty('intershop.classpath').split(':').each {
+            libs += "classpath files { new File('${it.replace('\\', '/')}') }\n"
+        }
+
+        new File(testProjectDir, 'init.gradle') << """\
+        initscript {
+            dependencies {
+                ${libs}
+            }
+        }
+        apply plugin: com.intershop.gradle.repoconfig.RepoConfigPlugin
+
+        repositoryConfiguration {
+
+            releaseRepo = 'https://test2.corporate.com/repo/content/group/releasesAll'
+            snapshotRepo = 'https://test2.corporate.com/repo/content/group/snapshotsAll'
+            publicMavenRepo = 'https://maven.repo.com/maven'
+            activateJCenter = true
+            repoHostList = ['test1.corporate.com', 'test2.corporate.com']
+            corporateName = 'test2 corporation'
+        }
+        """.stripIndent()
+
+        new File(testProjectDir, 'settings.gradle') << """\
+        rootProject.name = 'corporateplugin'
+        """.stripIndent()
+
+        buildFile << """
+        // provide some configurations etc.
+        apply plugin: 'java'
+        apply plugin: 'ivy-publish'
+        apply plugin: 'maven-publish'
+
+        assert repositories*.name as Set == ['intershopIvyLocal', 'intershopMavenLocal', 'intershopIvyReleasesAll', 'intershopMavenReleasesAll', 'intershopMavenMaven', 'BintrayJCenter'] as Set
+        assert publishing.repositories*.name as Set == ['intershopIvyLocal', 'intershopMavenLocal'] as Set
+        """.stripIndent()
+        
+        when:
+        preparedGradleRunner
+                    .withTestKitDir(new File(testProjectDir, 'testkit-tmp'))
+                    .withArguments('-I', 'init.gradle', '-s')
+                    .withGradleVersion(gradleVersion)
+                    .build()
+        
         then:
         noExceptionThrown()
 

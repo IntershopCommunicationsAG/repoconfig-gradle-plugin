@@ -80,4 +80,9 @@ class RepoConfigExtension {
      * Add jcenter to the list of repositories
      */
     boolean activateJCenter = false
+
+        /**
+     * Add mavenCentral to the list of repositories
+     */
+    boolean activateMavenCentral = false
 }
