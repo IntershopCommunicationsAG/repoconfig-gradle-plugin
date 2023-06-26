@@ -44,6 +44,7 @@ class RepoConfigPluginIntegSpec extends AbstractIntegrationSpec {
             snapshotRepo = 'https://test2.corporate.com/repo/content/group/snapshotsAll'
             publicMavenRepo = 'https://maven.repo.com/maven'
             activateJCenter = true
+            activateMavenCentral = true
             repoHostList = ['test1.corporate.com', 'test2.corporate.com']
             corporateName = 'test2 corporation'
         }
@@ -55,7 +56,7 @@ class RepoConfigPluginIntegSpec extends AbstractIntegrationSpec {
         apply plugin: 'ivy-publish'
         apply plugin: 'maven-publish'
 
-        assert repositories*.name as Set == ['ivyLocal', 'mavenLocal', 'ivyReleasesAll', 'mavenReleasesAll', 'mavenMaven', 'BintrayJCenter'] as Set
+        assert repositories*.name as Set == ['ivyLocal', 'mavenLocal', 'ivyReleasesAll', 'mavenReleasesAll', 'mavenMaven', 'MavenRepo', 'BintrayJCenter'] as Set
         assert publishing.repositories*.name as Set == ['ivyLocal', 'mavenLocal'] as Set
         """.stripIndent()
         
