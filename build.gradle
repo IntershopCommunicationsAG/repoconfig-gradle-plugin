@@ -202,5 +202,6 @@ dependencies {
 }
 
 repositories {
-    jcenter()
+    mavenCentral()
+    jcenter()    
 }
