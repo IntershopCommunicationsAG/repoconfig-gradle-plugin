@@ -104,6 +104,7 @@ deploymentBootstrap {
 |*`corporateName`* |`String`  | `null` |  | this property is used in information output
 |*`pulicMavenRepo`* |`String`  | `null` |  | repository URL of a repository or repository group with Maven artifacts. This can be used for a public Maven repository. The host of this repository is added to the list of allowed hosts automatically.
 |*`activateJCenter`* |`boolean`  | `false` |  | If this value is true, JCenter will be added to the list of repsoitories. The host of this repository is added to the list of allowed hosts automatically.
+|*`activateMavenCentral`* |`boolean`  | `false` |  | If this value is true, mavenCentral will be added to the list of repsoitories. The host of this repository is added to the list of allowed hosts automatically.
 
 |===
 
